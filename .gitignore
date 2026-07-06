@@ -1,5 +1,5 @@
 # Personal / local — never publish
-master_cv.pdf
+master_cv.*
 .claude/
 
 # Python
