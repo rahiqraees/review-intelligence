@@ -76,6 +76,10 @@ The modest gain is itself the finding: binary sentiment transfers well across
 domains, so a strong off-the-shelf baseline is hard to beat by a wide margin.
 Full numbers in [`results/sentiment_finetune.json`](results/sentiment_finetune.json).
 
+The fine-tuned model is published at
+[`rahiqr/distilbert-amazon-sentiment`](https://huggingface.co/rahiqr/distilbert-amazon-sentiment)
+and powers the sentiment scoring in the [live demo](https://huggingface.co/spaces/rahiqr/review-intelligence).
+
 ```bash
 # Reproduce (fine-tunes on a streamed subset; ~10 min on Apple Silicon)
 python scripts/03_finetune_sentiment.py --n-train 6000 --n-eval 1000 --epochs 2
