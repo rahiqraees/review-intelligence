@@ -1,0 +1,38 @@
+# Personal / local — never publish
+master_cv.pdf
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# Data & model artifacts (large; regenerated from code)
+data/*
+!data/.gitkeep
+models/
+*.pt
+*.bin
+*.safetensors
+
+# HF / caches
+.cache/
+*.log
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

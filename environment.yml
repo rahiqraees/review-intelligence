@@ -1,0 +1,13 @@
+name: review-intelligence
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - torch
+      - "transformers>=4.40,<5"
+      - datasets
+      - pandas
+      - scikit-learn
+      - pytest

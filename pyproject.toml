@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "review-intelligence"
+version = "0.1.0"
+description = "NLP toolkit for analyzing customer reviews with Transformers"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Rahiq Raees" }]
+license = { text = "MIT" }
+dependencies = [
+    "torch",
+    "transformers>=4.40,<5",
+    "datasets",
+    "pandas",
+    "scikit-learn",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

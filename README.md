@@ -1,0 +1,82 @@
+# Review Intelligence
+
+An NLP toolkit for turning unstructured customer reviews into structured,
+actionable signal — sentiment, topics, and summaries — built on
+[Hugging Face Transformers](https://huggingface.co/docs/transformers).
+
+The project is developed as one evolving system rather than a set of disconnected
+notebooks: it starts with off-the-shelf transformer pipelines and grows toward a
+fine-tuned, deployed model, engineered like production software (packaging,
+tests, CI, and reproducible environments).
+
+## Why this project
+
+Customer feedback arrives as free text at a scale no team can read manually.
+Review Intelligence classifies each review's **sentiment**, identifies which
+**topics** it touches (shipping, quality, price, support, ...), and produces a
+short **summary** — the building blocks of a feedback dashboard that tells a
+business *what* customers are unhappy about and *how much*.
+
+## What it does today
+
+| Capability | Task | Transformer architecture |
+|---|---|---|
+| Sentiment scoring | text classification | Encoder (DistilBERT / SST-2) |
+| Topic detection | zero-shot classification | Encoder (BART / MNLI) |
+| Review summarization | summarization | Encoder–decoder (DistilBART) |
+
+```python
+from review_intelligence import analyze_review
+
+analyze_review("Took three weeks to arrive and the box was crushed.")
+# {'sentiment': {'label': 'NEGATIVE', 'score': 0.99...},
+#  'topics':    {'labels': ['shipping and delivery', ...], 'scores': [...]},
+#  'summary':   '...'}
+```
+
+## Quickstart
+
+```bash
+# 1. Create the environment (installs PyTorch + Transformers)
+conda env create -f environment.yml
+conda activate review-intelligence
+
+# 2. Install the package
+pip install -e .
+
+# 3. Run the Chapter 1 demo on sample reviews
+python scripts/01_pipeline_baseline.py
+
+# 4. Run the tests
+pytest
+```
+
+The first run downloads model weights from the Hugging Face Hub and caches them
+locally; subsequent runs are fast.
+
+## Project structure
+
+```
+src/review_intelligence/   # installable package (the reusable API)
+scripts/                   # runnable demos, one per milestone
+tests/                     # pytest suite
+notebooks/                 # exploration and write-ups
+data/                      # datasets (gitignored; regenerated from code)
+```
+
+## Roadmap
+
+- [x] **Baseline** — analyze reviews with pretrained `pipeline()` models
+- [ ] **Behind the pipeline** — tokenization and model internals
+- [ ] **Fine-tuning** — train a custom review classifier and evaluate it
+- [ ] **Model sharing** — publish the fine-tuned model to the Hugging Face Hub
+- [ ] **Data & tokenizers** — scalable dataset processing
+- [ ] **Deployment** — interactive Gradio demo
+
+## Tech stack
+
+Python · PyTorch · Hugging Face Transformers & Datasets · pytest
+
+## License
+
+MIT
