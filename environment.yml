@@ -12,3 +12,4 @@ dependencies:
       - pandas
       - scikit-learn
       - pytest
+      - "gradio>=5,<6"

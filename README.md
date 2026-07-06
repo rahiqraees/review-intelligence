@@ -1,5 +1,7 @@
 # Review Intelligence
 
+[![CI](https://github.com/rahiqraees/review-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/rahiqraees/review-intelligence/actions/workflows/ci.yml)
+
 An NLP toolkit for turning unstructured customer reviews into structured,
 actionable signal — sentiment, topics, and summaries — built on
 [Hugging Face Transformers](https://huggingface.co/docs/transformers).

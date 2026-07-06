@@ -1,0 +1,4 @@
+# Dependencies for the Hugging Face Space (Gradio SDK).
+# Installs this project's package (which pins torch/transformers) plus Gradio.
+git+https://github.com/rahiqraees/review-intelligence.git@main
+gradio>=5,<6

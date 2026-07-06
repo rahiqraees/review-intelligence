@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install CPU-only PyTorch
+        # The default torch wheel bundles CUDA (~2 GB); the CPU build keeps CI fast.
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Run fast tests
+        # Skip the slow model-download integration tests in CI.
+        run: pytest -m "not slow" -v
