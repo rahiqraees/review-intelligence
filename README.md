@@ -1,10 +1,14 @@
 # Review Intelligence
 
 [![CI](https://github.com/rahiqraees/review-intelligence/actions/workflows/ci.yml/badge.svg)](https://github.com/rahiqraees/review-intelligence/actions/workflows/ci.yml)
+[![Hugging Face Space](https://img.shields.io/badge/🤗%20Demo-Hugging%20Face%20Space-blue)](https://huggingface.co/spaces/rahiqr/review-intelligence)
 
 An NLP toolkit for turning unstructured customer reviews into structured,
 actionable signal — sentiment, topics, and summaries — built on
 [Hugging Face Transformers](https://huggingface.co/docs/transformers).
+
+**▶ Try the live demo:** https://huggingface.co/spaces/rahiqr/review-intelligence
+(first load is slow while models warm up, then fast).
 
 The project is developed as one evolving system rather than a set of disconnected
 notebooks: it starts with off-the-shelf transformer pipelines and grows toward a
@@ -94,7 +98,7 @@ data/                      # datasets (gitignored; regenerated from code)
 - [x] **Fine-tuning** — train a custom review classifier and evaluate it
 - [ ] **Model sharing** — publish the fine-tuned model to the Hugging Face Hub
 - [ ] **Data & tokenizers** — scalable dataset processing
-- [ ] **Deployment** — interactive Gradio demo
+- [x] **Deployment** — interactive Gradio demo on Hugging Face Spaces
 
 ## Tech stack
 
