@@ -23,10 +23,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Install CPU-only PyTorch
-        # The default torch wheel bundles CUDA (~2 GB); the CPU build keeps CI fast.
-        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
-
       - name: Install package
         run: pip install -e ".[dev]"
 
