@@ -1,0 +1,269 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{array}
+
+\definecolor{primarycolor}{RGB}{0, 102, 204}
+
+\hypersetup{colorlinks=true, urlcolor=primarycolor, linkcolor=primarycolor}
+
+\setlist[itemize]{leftmargin=1.5em, itemsep=2pt, topsep=2pt}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+% Colored, bold section titles without titlesec.
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{\z@}%
+  {-3.0ex \@plus -1ex \@minus -.2ex}{1.5ex \@plus.2ex}%
+  {\Large\bfseries\color{primarycolor}}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}%
+  {-2.5ex\@plus -1ex \@minus -.2ex}{1.0ex \@plus .2ex}%
+  {\large\bfseries}}
+\makeatother
+
+\begin{document}
+
+%---------- TITLE ----------
+\begin{center}
+    {\Huge \bfseries \color{primarycolor} Review Intelligence} \\[4pt]
+    {\large An End-to-End NLP Project: from pretrained transformers to a fine-tuned, deployed model} \\[8pt]
+    {\large Rahiq Raees} \\[2pt]
+    {\normalsize July 2026} \\[6pt]
+    \normalsize
+    \href{https://github.com/rahiqraees/review-intelligence}{GitHub Repository} $\quad|\quad$
+    \href{https://huggingface.co/spaces/rahiqr/review-intelligence}{Live Demo} $\quad|\quad$
+    \href{https://huggingface.co/rahiqr/distilbert-amazon-sentiment}{Fine-tuned Model}
+\end{center}
+
+\vspace{6pt}
+\hrule
+\vspace{10pt}
+
+\tableofcontents
+\vspace{10pt}
+\hrule
+\vspace{10pt}
+
+%---------- EXECUTIVE SUMMARY ----------
+\section{Executive Summary}
+
+\textbf{Review Intelligence} is an end-to-end natural language processing (NLP)
+system that turns unstructured customer reviews into structured, actionable
+signal: \textbf{sentiment}, \textbf{topics}, and a short \textbf{summary}.
+
+The project was built deliberately as one evolving system rather than a set of
+disconnected tutorials. It progresses from off-the-shelf transformer models,
+through a deep understanding of how those models work internally, to a
+\textbf{custom model fine-tuned on real product-review data}, and finally to a
+\textbf{live, publicly hosted web application} that serves that model.
+
+Key outcomes:
+\begin{itemize}
+    \item Fine-tuned a DistilBERT transformer that improved product-review
+    sentiment accuracy from \textbf{88.6\% to 89.7\%} (F1 0.899) over a strong
+    pretrained baseline, with an honest, controlled evaluation.
+    \item Published the fine-tuned model to the Hugging Face Hub and deployed an
+    interactive demo on Hugging Face Spaces that serves it live.
+    \item Engineered the codebase to a production standard: an installable
+    Python package, an automated test suite, and continuous integration (CI).
+\end{itemize}
+
+%---------- MOTIVATION ----------
+\section{Motivation and Objective}
+
+Businesses receive customer feedback as free-form text at a volume no team can
+read manually. Automatically classifying each review's sentiment, identifying
+which topics it touches (shipping, product quality, price, support), and
+summarizing it are the building blocks of a feedback dashboard that tells a
+company \emph{what} customers are unhappy about and \emph{how much}.
+
+The objective was to build such a system while demonstrating the full modern NLP
+workflow --- using pretrained transformer models, understanding their internals,
+adapting them to a specific domain through fine-tuning, and deploying the result
+--- all with the software-engineering rigor expected in production
+(reproducible environments, testing, CI, and deployment).
+
+%---------- WHAT IT DOES ----------
+\section{What the System Does}
+
+The system exposes three analyzers, each deliberately built on a different
+transformer \emph{architecture}. This mapping is a core NLP concept: different
+model designs suit different tasks.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{4.6cm}|>{\raggedright\arraybackslash}p{5.2cm}|}
+\hline
+\textbf{Capability} & \textbf{Task} & \textbf{Transformer architecture} \\
+\hline
+Sentiment scoring & Text classification & Encoder (DistilBERT) --- reads the whole
+sentence to \emph{understand} it \\
+\hline
+Topic detection & Zero-shot classification & Encoder (BART fine-tuned on natural
+language inference) \\
+\hline
+Summarization & Sequence-to-sequence & Encoder--decoder (DistilBART) --- reads
+the review and \emph{generates} a shorter one \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Example.} Given the review \emph{``The product itself is fine, but it took
+three weeks to arrive and the box was crushed,''} the system returns sentiment
+\code{NEGATIVE}, top topic \emph{shipping and delivery}, and a one-line summary.
+
+%---------- TECHNICAL APPROACH ----------
+\section{Technical Approach}
+
+The system was built in four stages, each adding a capability and a deeper level
+of understanding.
+
+\subsection{Stage 1 --- Baseline with pretrained pipelines}
+
+The first version used Hugging Face \code{pipeline()} objects --- a high-level
+interface to run production-grade transformer models with a single call. This
+established a working baseline on real reviews and demonstrated the three
+transformer families (encoder, decoder, encoder--decoder).
+
+A notable technique here is \textbf{zero-shot classification} for topic
+detection: rather than training a classifier on labeled topic data, the system
+reframes ``is this review about shipping?'' as a natural-language-inference
+question. This lets the topic labels be defined at run time and changed freely
+without any retraining.
+
+\subsection{Stage 2 --- Understanding the internals}
+
+To move beyond treating the models as black boxes, the sentiment pipeline was
+reproduced manually, stage by stage:
+\begin{itemize}
+    \item \textbf{Tokenizer:} converts text into integer token IDs and adds the
+    special tokens the model expects, producing an ``attention mask'' that marks
+    real tokens versus padding.
+    \item \textbf{Model:} runs the transformer to produce raw scores (logits).
+    \item \textbf{Post-processing:} applies a softmax to convert logits into
+    probabilities, then selects the highest-scoring label.
+\end{itemize}
+The manual result matched the pipeline's output exactly, confirming a correct
+understanding of every step --- a prerequisite for the fine-tuning that follows.
+
+\subsection{Stage 3 --- Fine-tuning a domain-specific model}
+
+The baseline sentiment model is trained on \emph{movie} reviews (the SST-2
+dataset), while this project analyzes \emph{product} reviews --- a different
+domain with different vocabulary. To close this gap, a DistilBERT model was
+\textbf{fine-tuned} (an application of transfer learning) on a streamed,
+class-balanced subset of the Amazon product-reviews dataset.
+
+Methodology:
+\begin{itemize}
+    \item Data loaded and processed with the Hugging Face \code{datasets}
+    library; sequences tokenized in batches with dynamic padding for efficiency.
+    \item Training run with the Hugging Face \code{Trainer} API (6{,}000
+    training reviews, 2 epochs, learning rate $2\times10^{-5}$).
+    \item Evaluated honestly: the fine-tuned model and the movie-trained baseline
+    were both scored on the \emph{same} 1{,}000 held-out product reviews, using
+    accuracy and F1.
+\end{itemize}
+
+\subsection{Stage 4 --- Publishing and deployment}
+
+The fine-tuned model was published to the Hugging Face Hub as a model repository
+with a model card documenting its data, results, and usage. An interactive web
+application was built with Gradio and deployed to Hugging Face Spaces, where it
+runs on hosted CPU hardware and serves the fine-tuned model to any user with the
+link.
+
+%---------- RESULTS ----------
+\section{Results}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{7cm}|c|c|}
+\hline
+\textbf{Model (evaluated on product reviews)} & \textbf{Accuracy} & \textbf{F1} \\
+\hline
+Baseline (movie-trained, SST-2) & 88.6\% & 0.888 \\
+\hline
+\textbf{Fine-tuned (product reviews)} & \textbf{89.7\%} & \textbf{0.899} \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Interpretation.} The improvement of $+1.1$ percentage points is real but
+modest, and understanding \emph{why} is part of the result. Binary sentiment
+transfers well across domains --- ``I love it'' reads the same in a movie or a
+product review --- so the off-the-shelf baseline was already strong, leaving a
+small domain gap to close. Reporting a genuine, well-measured improvement against
+a strong baseline, and understanding its size, reflects sound evaluation
+practice: a controlled comparison on a held-out set, rather than an inflated
+number from a weak baseline or a leaky test.
+
+%---------- ENGINEERING ----------
+\section{Software Engineering Practices}
+
+The project was engineered like production software, not a one-off notebook:
+\begin{itemize}
+    \item \textbf{Installable package} with a clean, reusable API separating
+    library code from runnable scripts.
+    \item \textbf{Reproducible environment} pinned via a Conda environment file,
+    including a deliberate version pin to keep results stable across library
+    updates.
+    \item \textbf{Automated tests} (\code{pytest}), split into fast unit tests
+    (no model downloads, safe for CI) and slower integration tests.
+    \item \textbf{Continuous integration} via GitHub Actions, running the test
+    suite across Python 3.10 and 3.11 on every change.
+    \item \textbf{Deployment} of both a model artifact (to the Hub) and a live
+    application (to Spaces).
+\end{itemize}
+
+%---------- SKILLS ----------
+\section{Skills and Tools Demonstrated}
+
+\begin{itemize}
+    \item \textbf{NLP / Transformers:} tokenization, model internals, encoder vs.
+    encoder--decoder architectures, zero-shot classification, fine-tuning,
+    transfer learning.
+    \item \textbf{Ecosystem:} Hugging Face Transformers, Datasets, Hub, and
+    Spaces; PyTorch; Gradio.
+    \item \textbf{Evaluation:} controlled baseline comparison, accuracy and F1,
+    train/test hygiene.
+    \item \textbf{Engineering:} Python packaging, \code{pytest}, GitHub Actions
+    CI, reproducible environments, model and application deployment.
+\end{itemize}
+
+%---------- LIMITATIONS ----------
+\section{Limitations and Future Work}
+
+\begin{itemize}
+    \item \textbf{Binary sentiment.} The current model predicts positive or
+    negative only; genuinely mixed reviews are forced into one class. A natural
+    next step is a three-class (negative / neutral / positive) model to capture
+    nuance.
+    \item \textbf{Demo hardware.} The live demo runs on free CPU hardware, so the
+    first request is slow while models load, then fast.
+    \item \textbf{Next project.} The same skills are being extended to a
+    retrieval-augmented question-answering (RAG) system in a new domain,
+    combining semantic search with a question-answering model.
+\end{itemize}
+
+%---------- LINKS ----------
+\section{Links and Reproducibility}
+
+\begin{itemize}
+    \item \textbf{Source code:}
+    \href{https://github.com/rahiqraees/review-intelligence}{github.com/rahiqraees/review-intelligence}
+    \item \textbf{Live demo:}
+    \href{https://huggingface.co/spaces/rahiqr/review-intelligence}{huggingface.co/spaces/rahiqr/review-intelligence}
+    \item \textbf{Fine-tuned model:}
+    \href{https://huggingface.co/rahiqr/distilbert-amazon-sentiment}{huggingface.co/rahiqr/distilbert-amazon-sentiment}
+\end{itemize}
+
+The repository includes setup instructions, runnable scripts for each stage, and
+the recorded evaluation metrics, so the full pipeline can be reproduced from
+scratch.
+
+\end{document}

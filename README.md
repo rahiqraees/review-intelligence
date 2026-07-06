@@ -10,6 +10,9 @@ actionable signal — sentiment, topics, and summaries — built on
 **▶ Try the live demo:** https://huggingface.co/spaces/rahiqr/review-intelligence
 (first load is slow while models warm up, then fast).
 
+**📄 Full project report:** [`docs/report.pdf`](docs/report.pdf) — a walkthrough of
+the motivation, methodology, results, and engineering behind the project.
+
 The project is developed as one evolving system rather than a set of disconnected
 notebooks: it starts with off-the-shelf transformer pipelines and grows toward a
 fine-tuned, deployed model, engineered like production software (packaging,

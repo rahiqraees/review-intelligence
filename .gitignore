@@ -32,6 +32,14 @@ models/
 .cache/
 *.log
 
+# LaTeX build artifacts (keep report.tex and report.pdf)
+*.aux
+*.toc
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
 # OS / editor
 .DS_Store
 .vscode/
