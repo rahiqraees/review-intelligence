@@ -10,7 +10,7 @@ On Hugging Face Spaces this file is the entry point (SDK: gradio).
 import gradio as gr
 
 from review_intelligence import analyze_review
-from review_intelligence.baseline import DEFAULT_TOPICS
+from review_intelligence.baseline import DEFAULT_TOPICS, FINETUNED_SENTIMENT_MODEL
 
 EXAMPLES = [
     "Absolutely love this blender! It crushes ice in seconds and the customer "
@@ -29,7 +29,10 @@ def analyze(review: str, topics_text: str):
 
     # Comma-separated custom topics override the defaults; blank falls back.
     topics = [t.strip() for t in topics_text.split(",") if t.strip()] or None
-    report = analyze_review(review, topics=topics)
+    # Sentiment is scored by our own fine-tuned product-review model.
+    report = analyze_review(
+        review, topics=topics, sentiment_model=FINETUNED_SENTIMENT_MODEL
+    )
 
     sentiment = {report["sentiment"]["label"]: report["sentiment"]["score"]}
     topics_out = dict(zip(report["topics"]["labels"], report["topics"]["scores"]))
@@ -40,7 +43,9 @@ with gr.Blocks(title="Review Intelligence") as demo:
     gr.Markdown(
         "# Review Intelligence\n"
         "Turn a customer review into structured signal — **sentiment**, "
-        "**topics**, and a **summary** — using Hugging Face Transformers."
+        "**topics**, and a **summary** — using Hugging Face Transformers.\n\n"
+        "_Sentiment is scored by a DistilBERT model I fine-tuned on product "
+        "reviews; topics and summary use off-the-shelf pipelines._"
     )
     with gr.Row():
         with gr.Column():

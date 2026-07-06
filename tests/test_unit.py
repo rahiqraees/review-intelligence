@@ -51,7 +51,7 @@ def test_classify_topics_uses_custom_topics(monkeypatch):
 
 
 def test_analyze_review_composes_all_three(monkeypatch):
-    monkeypatch.setattr(baseline, "score_sentiment", lambda t: {"label": "NEGATIVE", "score": 0.5})
+    monkeypatch.setattr(baseline, "score_sentiment", lambda t, model=None: {"label": "NEGATIVE", "score": 0.5})
     monkeypatch.setattr(baseline, "classify_topics", lambda t, topics=None: {"labels": ["x"], "scores": [1.0]})
     monkeypatch.setattr(baseline, "summarize", lambda t: "a summary")
 

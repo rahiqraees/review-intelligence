@@ -33,6 +33,10 @@ SENTIMENT_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"
 ZERO_SHOT_MODEL = "facebook/bart-large-mnli"
 SUMMARIZATION_MODEL = "sshleifer/distilbart-cnn-12-6"
 
+# Our own model, fine-tuned on product reviews in Chapter 3 and published to the
+# Hub. The live demo uses this in place of the movie-trained default above.
+FINETUNED_SENTIMENT_MODEL = "rahiqr/distilbert-amazon-sentiment"
+
 # Default topics for customer reviews. Zero-shot means these are *not* baked
 # into the model — we can change them freely without retraining.
 DEFAULT_TOPICS = [
@@ -50,13 +54,14 @@ def _get_pipeline(task: str, model: str) -> Pipeline:
     return pipeline(task, model=model)
 
 
-def score_sentiment(text: str) -> dict:
+def score_sentiment(text: str, model: str = SENTIMENT_MODEL) -> dict:
     """Classify a review as POSITIVE/NEGATIVE with a confidence score.
 
-    Uses an *encoder* model (DistilBERT fine-tuned on SST-2). Returns e.g.
-    ``{"label": "POSITIVE", "score": 0.9998}``.
+    Uses an *encoder* model. ``model`` defaults to the off-the-shelf SST-2
+    checkpoint; pass ``FINETUNED_SENTIMENT_MODEL`` to use our product-review
+    model instead. Returns e.g. ``{"label": "POSITIVE", "score": 0.9998}``.
     """
-    clf = _get_pipeline("sentiment-analysis", SENTIMENT_MODEL)
+    clf = _get_pipeline("sentiment-analysis", model)
     return clf(text)[0]
 
 
@@ -80,10 +85,18 @@ def summarize(text: str, max_length: int = 60, min_length: int = 10) -> str:
     return out[0]["summary_text"]
 
 
-def analyze_review(text: str, topics: list[str] | None = None) -> dict:
-    """Run all three analyzers on a single review and return a combined report."""
+def analyze_review(
+    text: str,
+    topics: list[str] | None = None,
+    sentiment_model: str = SENTIMENT_MODEL,
+) -> dict:
+    """Run all three analyzers on a single review and return a combined report.
+
+    Pass ``sentiment_model=FINETUNED_SENTIMENT_MODEL`` to score sentiment with
+    our fine-tuned product-review model (as the live demo does).
+    """
     return {
-        "sentiment": score_sentiment(text),
+        "sentiment": score_sentiment(text, model=sentiment_model),
         "topics": classify_topics(text, topics),
         "summary": summarize(text),
     }
