@@ -1,0 +1,9 @@
+{
+  "n_train": 6000,
+  "n_eval": 1000,
+  "epochs": 2,
+  "baseline_accuracy": 0.886,
+  "baseline_f1": 0.8875739644970414,
+  "finetuned_accuracy": 0.897,
+  "finetuned_f1": 0.8987217305801377
+}

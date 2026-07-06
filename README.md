@@ -54,6 +54,27 @@ pytest
 The first run downloads model weights from the Hugging Face Hub and caches them
 locally; subsequent runs are fast.
 
+## Fine-tuning result
+
+The Chapter 1 sentiment model was trained on movie reviews (SST-2). To fit our
+actual domain, a DistilBERT classifier was fine-tuned on Amazon **product**
+reviews and benchmarked against the movie-trained model on the same 1,000
+held-out product reviews:
+
+| Model | Accuracy | F1 |
+|---|---|---|
+| Baseline (movie-trained, SST-2) | 88.6% | 0.888 |
+| **Fine-tuned (product reviews)** | **89.7%** | **0.899** |
+
+The modest gain is itself the finding: binary sentiment transfers well across
+domains, so a strong off-the-shelf baseline is hard to beat by a wide margin.
+Full numbers in [`results/sentiment_finetune.json`](results/sentiment_finetune.json).
+
+```bash
+# Reproduce (fine-tunes on a streamed subset; ~10 min on Apple Silicon)
+python scripts/03_finetune_sentiment.py --n-train 6000 --n-eval 1000 --epochs 2
+```
+
 ## Project structure
 
 ```
@@ -67,8 +88,8 @@ data/                      # datasets (gitignored; regenerated from code)
 ## Roadmap
 
 - [x] **Baseline** — analyze reviews with pretrained `pipeline()` models
-- [ ] **Behind the pipeline** — tokenization and model internals
-- [ ] **Fine-tuning** — train a custom review classifier and evaluate it
+- [x] **Behind the pipeline** — tokenization and model internals
+- [x] **Fine-tuning** — train a custom review classifier and evaluate it
 - [ ] **Model sharing** — publish the fine-tuned model to the Hugging Face Hub
 - [ ] **Data & tokenizers** — scalable dataset processing
 - [ ] **Deployment** — interactive Gradio demo
